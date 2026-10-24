@@ -1,0 +1,35 @@
+services:
+  turnos-api:
+    build:
+      context: ./turnos-backend
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: ${SUPABASE_CONNECTION_STRING:?Define SUPABASE_CONNECTION_STRING en .env}
+      Security__JwtSigningKey: ${JWT_SIGNING_KEY:?Define JWT_SIGNING_KEY en .env}
+      Security__JwtEncryptionKey: ${JWT_ENCRYPTION_KEY:?Define JWT_ENCRYPTION_KEY en .env}
+      Security__DataEncryptionKey: ${DATA_ENCRYPTION_KEY:?Define DATA_ENCRYPTION_KEY en .env}
+      Security__LookupHmacKey: ${LOOKUP_HMAC_KEY:?Define LOOKUP_HMAC_KEY en .env}
+      Security__Issuer: Turnos.Api
+      Security__Audience: Turnos.Web
+      Cors__Origins__0: http://localhost:8081
+    expose:
+      - "8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  turnos-web:
+    build:
+      context: ./turnos-fronted/turnos-web
+      dockerfile: Dockerfile
+    ports:
+      - "8081:80"
+    depends_on:
+      turnos-api:
+        condition: service_healthy
+    restart: unless-stopped
