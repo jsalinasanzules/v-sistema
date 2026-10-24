@@ -47,7 +47,7 @@ public sealed class AuditService(IConfiguration config, ILogger<AuditService> lo
             await using var db = await Db.Source(config).OpenConnectionAsync();
             await db.ExecuteAsync("insert into app.audit_events(actor_user_id, action, entity_name, entity_id, details) values (@actor,@action,@entity,@id,cast(@details as jsonb))",
                 new { actor, action, entity, id, details = details is null ? null : JsonSerializer.Serialize(details) });
-        } catch (Exception ex) { log.Error(ex, "Audit insert failed for {Action}/{Entity}", action, entity); }
+        } catch (Exception ex) { log.LogError(ex, "Audit insert failed for {Action}/{Entity}", action, entity); }
     }
 }
 
@@ -73,7 +73,7 @@ public sealed class AuthService(IConfiguration config, DataProtectionService cry
                 await db.ExecuteAsync("update app.users set failed_login_attempts=least(failed_login_attempts+1,32767), is_blocked=(failed_login_attempts+1>=5), updated_at=now() where id=@id", new { user.Id });
                 await audit.WriteAsync(user.Id, "LOGIN_FAILED", "users", user.Id.ToString(), new { username });
             } else await audit.WriteAsync(null, "LOGIN_FAILED", "users", null, new { username });
-            logger.Warning("Failed login attempt for username {Username} from {IP}", username, ip);
+            logger.LogWarning("Failed login attempt for username {Username} from {IP}", username, ip);
             throw new UnauthorizedAccessException("Credenciales inválidas o usuario pendiente/inactivo/bloqueado.");
         }
         await db.ExecuteAsync("update app.users set failed_login_attempts=0,last_login_at=now(),updated_at=now() where id=@id", new { user.Id });

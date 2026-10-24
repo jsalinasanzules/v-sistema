@@ -161,7 +161,7 @@ public sealed class BusinessService(IConfiguration config, AuditService audit)
 {
     public async Task<IEnumerable<object>> ServicesAsync() {
         await using var db=await Db.Source(config).OpenConnectionAsync();
-        return await db.QueryAsync("select id,name,description,equipment,speed_mbps as "speedMbps",price,is_active as "isActive" from app.internet_services where deleted_at is null order by name");
+        return await db.QueryAsync("select id,name,description,equipment,speed_mbps as 'speedMbps',price,is_active as 'isActive' from app.internet_services where deleted_at is null order by name");
     }
     public async Task<Guid> CreateServiceAsync(ServiceRequest x,Guid actor) {
         if(x.SpeedMbps<=0 || x.Price<0) throw new ArgumentException("Velocidad y precio inválidos.");
