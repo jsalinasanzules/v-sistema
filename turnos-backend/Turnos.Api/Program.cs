@@ -42,6 +42,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidateAudience = true, ValidAudience = builder.Configuration["Security:Audience"] ?? "Turnos.Web",
         ValidateLifetime = true, ClockSkew = TimeSpan.FromSeconds(30),
         ValidateIssuerSigningKey = true,
+        RoleClaimType = "role",
+        NameClaimType = "name",
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey.PadRight(32, '0')[..32])),
         TokenDecryptionKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(encryptionKey.PadRight(32, '0')[..32]))
     };
