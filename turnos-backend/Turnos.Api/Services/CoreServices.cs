@@ -9,10 +9,11 @@ namespace Turnos.Api.Services;
 
 public static class Db
 {
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, NpgsqlDataSource> Sources = new();
     public static NpgsqlDataSource Source(IConfiguration c) {
         var cs = c.GetConnectionString("DefaultConnection");
         if (string.IsNullOrWhiteSpace(cs)) throw new InvalidOperationException("ConnectionStrings:DefaultConnection is required.");
-        return NpgsqlDataSource.Create(cs);
+        return Sources.GetOrAdd(cs, static connectionString => NpgsqlDataSource.Create(connectionString));
     }
 }
 
