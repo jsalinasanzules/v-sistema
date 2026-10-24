@@ -1,59 +1,36 @@
-# TurnosWeb
+# Turnos Web — Angular
+Frontend modular para gestión de turnos. Incluye login, guardias de ruta, interceptor JWT, menú por rol desde API y dashboard responsive.
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.4.
+## Requisitos
+- Node.js y npm compatibles con Angular CLI del proyecto.
+- API ASP.NET Core disponible en `http://localhost:5164`.
+- Ejecutar en Supabase los scripts SQL iniciales, incluido `002_dynamic_menu.sql`.
 
-## Development server
-
-To start a local development server, run:
-
+## Desarrollo
 ```bash
-ng serve
+npm ci
+npm start
+```
+Abre http://localhost:4200. `proxy.conf.json` reenvía las peticiones `/api` a `http://localhost:5164`; cambia el destino si tu API usa otro puerto.
+
+## Compilar
+```bash
+npm run build
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Estructura modular
+- `src/app/core/auth.service.ts`: login, sesión, usuario actual y menú dinámico.
+- `src/app/core/auth.guard.ts`: protección de rutas.
+- `src/app/core/api.interceptor.ts`: adjunta JWT Bearer a las peticiones API.
+- `src/app/pages/login.component.ts`: formulario validado, errores, loading y pantalla informativa de recuperación.
+- `src/app/pages/workspace.component.ts`: bienvenida, indicadores, usuarios, turnos, clientes y cajas.
+- `src/app/app.routes.ts`: módulos cargados de forma diferida.
 
-## Code scaffolding
+## Endpoints consumidos
+`POST /api/auth/login`, `GET /api/auth/me`, `GET /api/menu`, endpoints de usuarios, turnos, clientes, cajas, servicios, contratos y pagos documentados en el backend.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Pendiente de completar con el backend
+La recuperación de contraseña todavía no tiene endpoint; la UI lo informa y no simula envío. La importación CSV solo lee/valida el archivo y avisa que no se han persistido filas porque falta un endpoint de importación masiva; XLSX requiere soporte adicional. Faltan endpoints dedicados para actualización de usuarios/clientes, filtros de fecha, reportes y asignación específica de turnos a cajeros.
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Docker
+El Dockerfile compila el frontend y sirve los archivos estáticos con Nginx. Nginx reenvía `/api` al servicio Docker `turnos-api:8080`. El backend y frontend deben compartir una red en Docker Compose.
