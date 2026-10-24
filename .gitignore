@@ -1,4 +1,3 @@
-cat > .gitignore <<'EOF'
 # macOS
 .DS_Store
 .AppleDouble
@@ -7,12 +6,14 @@ cat > .gitignore <<'EOF'
 # IDEs
 .vs/
 .idea/
+.vscode/*
+!.vscode/extensions.json
 *.user
 *.suo
 *.userosscache
 *.sln.docstates
 
-# .NET
+# .NET build artifacts
 **/bin/
 **/obj/
 **/TestResults/
@@ -29,19 +30,19 @@ npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
 
-# Secrets and environment variables
+# Secrets / local configuration
 .env
 .env.*
 !.env.example
-appsettings.Development.json
-appsettings.*.json
-secrets.json
+**/appsettings.Development.json
+**/appsettings.Local.json
+**/secrets.json
 *.pfx
 *.p12
 
 # Logs
 *.log
-logs/
+**/logs/
 
 # Temporary files
 *.tmp
@@ -53,4 +54,3 @@ logs/
 *.db
 *.sqlite
 *.sqlite3
-EOF
