@@ -53,7 +53,7 @@ export class LoginComponent {
   readonly loading = signal(false); readonly error = signal(''); readonly recovering = signal(false); readonly recoveryMessage = signal('');
   readonly form: FormGroup; readonly recoveryForm: FormGroup;
   constructor(fb: FormBuilder, private auth: AuthService, private router: Router) {
-    this.form = fb.nonNullable.group({ username: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern(/^(?=.*[0-9])[A-Za-z0-9]+$/)]], password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(30)]] });
+    this.form = fb.nonNullable.group({ username: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern(/^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]+$/)]], password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(30), Validators.pattern(/^(?=.*[A-Z])(?=.*[0-9]).+$/)]] });
     this.recoveryForm = fb.nonNullable.group({ identity: ['', [Validators.required, Validators.maxLength(120)]] });
   }
   submit(): void {
