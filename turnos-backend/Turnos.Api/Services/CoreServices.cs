@@ -63,8 +63,16 @@ public sealed class AuthService(IConfiguration config, DataProtectionService cry
     public async Task<object> LoginAsync(string username, string password, string? ip, string? agent) {
         await using var db = await Db.Source(config).OpenConnectionAsync();
         var user = await db.QuerySingleOrDefaultAsync<LoginRow>("""
-          select u.id, u.username, u.password_hash, u.first_name, u.last_name, u.failed_login_attempts,
-                 u.is_blocked, u.is_active, u.status, r.code as role
+          select u.id as "Id",
+                 u.username as "Username",
+                 u.password_hash as "PasswordHash",
+                 u.first_name as "FirstName",
+                 u.last_name as "LastName",
+                 u.failed_login_attempts as "FailedLoginAttempts",
+                 u.is_blocked as "IsBlocked",
+                 u.is_active as "IsActive",
+                 u.status as "Status",
+                 r.code as "Role"
           from app.users u join app.roles r on r.id=u.role_id
           where lower(u.username)=lower(@username) and u.deleted_at is null
           """, new { username });
