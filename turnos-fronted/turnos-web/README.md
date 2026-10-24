@@ -3,7 +3,7 @@ Frontend modular para gestión de turnos. Incluye login, guardias de ruta, inter
 
 ## Requisitos
 - Node.js y npm compatibles con Angular CLI del proyecto.
-- API ASP.NET Core disponible en `http://localhost:5164`.
+- API ASP.NET Core disponible en `http://localhost:5065`.
 - Ejecutar en Supabase los scripts SQL iniciales, incluido `002_dynamic_menu.sql`.
 
 ## Desarrollo
@@ -11,7 +11,7 @@ Frontend modular para gestión de turnos. Incluye login, guardias de ruta, inter
 npm ci
 npm start
 ```
-Abre http://localhost:4200. `proxy.conf.json` reenvía las peticiones `/api` a `http://localhost:5164`; cambia el destino si tu API usa otro puerto.
+Abre http://localhost:4200. `proxy.conf.json` reenvía las peticiones `/api` a `http://localhost:5065`; cambia el destino si tu API usa otro puerto.
 
 ## Compilar
 ```bash

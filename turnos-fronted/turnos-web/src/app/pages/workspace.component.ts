@@ -5,7 +5,39 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService, MenuItem } from '../core/auth.service';
 
-type Row = Record<string, any>;
+interface Row extends Record<string, any> {
+ id?: string | number;
+ username?: string;
+ email?: string;
+ firstName?: string;
+ first_name?: string;
+ lastName?: string;
+ last_name?: string;
+ role?: string;
+ roleCode?: string;
+ role_code?: string;
+ status?: string;
+ isActive?: boolean;
+ is_active?: boolean;
+ code?: string;
+ turnCode?: string;
+ turn_code?: string;
+ attentionType?: string;
+ attention_type?: string;
+ type?: string;
+ createdAt?: string | Date;
+ created_at?: string | Date;
+ assignedAt?: string | Date;
+ assigned_at?: string | Date;
+ identification?: string;
+ identificationNumber?: string;
+ phone?: string;
+ label?: string;
+ description?: string;
+ name?: string;
+ isBlocked?: boolean;
+ is_blocked?: boolean;
+}
 @Component({
  selector:'app-workspace', standalone:true, imports:[CommonModule,FormsModule],
  template:`
@@ -73,14 +105,23 @@ export class WorkspaceComponent implements OnInit {
  readonly stats=signal({turns:0,users:0,blocked:0,boxes:0,active:0,pending:0,assigned:0,clients:0,inProgress:0});
  readonly showUserForm=signal(false); readonly showTurnForm=signal(false); readonly showClientForm=signal(false); readonly showBoxForm=signal(false);
  search=''; userForm:any={username:'',password:'',firstName:'',lastName:'',email:'',identification:'',roleCode:'CAJERO'}; turnForm:any={attentionTypeId:0}; clientForm:any={identification:'',firstName:'',lastName:'',email:'',phone:'',address:'',addressReference:''}; boxForm:any={code:'',name:'',description:''};
- readonly role = this.auth.user()?.role || '';
- readonly displayName = this.auth.user()?.name || [this.auth.user()?.firstName,this.auth.user()?.lastName].filter(Boolean).join(' ') || this.auth.user()?.username || 'Usuario';
- readonly firstName = this.displayName.split(' ')[0]; readonly initials = this.displayName.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase(); readonly roleLabel = this.role==='ADMINISTRADOR'?'Administrador':this.role==='GESTOR'?'Gestor':'Cajero';
+ readonly role: string;
+ readonly displayName: string;
+ readonly firstName: string;
+ readonly initials: string;
+ readonly roleLabel: string;
  readonly today = new Intl.DateTimeFormat('es-EC',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}).format(new Date());
  readonly pageTitle = computed(()=>this.menu().find(x=>this.normalize(x)===this.active())?.label || ({dashboard:'Inicio',home:'Inicio',bienvenida:'Bienvenida',users:'Usuarios',approvals:'Aprobaciones',turns:'Turnos',clients:'Clientes',cashboxes:'Cajas',services:'Servicios',contracts:'Contratos',payments:'Pagos',reports:'Reportes'} as Record<string,string>)[this.active()] || 'Panel de trabajo');
  readonly filteredRows = computed(()=>{const term=this.search.toLowerCase().trim(); return this.rows().filter(r=>!term||Object.values(r).some(v=>String(v??'').toLowerCase().includes(term)));});
  readonly columns = computed(()=>this.rows().length?Object.keys(this.rows()[0]).filter(k=>!k.toLowerCase().includes('cipher')&&!k.toLowerCase().includes('lookup')&&!k.toLowerCase().includes('hash')).slice(0,6):[]);
- constructor(private auth:AuthService,private http:HttpClient,private router:Router){}
+ constructor(private auth:AuthService,private http:HttpClient,private router:Router){
+  const user=this.auth.user();
+  this.role=user?.role||'';
+  this.displayName=user?.name||[user?.firstName,user?.lastName].filter(Boolean).join(' ')||user?.username||'Usuario';
+  this.firstName=this.displayName.split(' ')[0];
+  this.initials=this.displayName.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
+  this.roleLabel=this.role==='ADMINISTRADOR'?'Administrador':this.role==='GESTOR'?'Gestor':'Cajero';
+ }
  ngOnInit():void { this.auth.loadMenu().subscribe({next:m=>{this.menu.set(m);},error:()=>this.showNotice('No se pudo cargar el menú desde la base de datos. Revisa el script 002_dynamic_menu.sql.','error')}); this.refresh(); }
  normalize(item:MenuItem):string { const route=(item.route||item.code||'dashboard').toLowerCase().replace(/^\//,'').split('/')[0]; const map:Record<string,string>={home:'dashboard',inicio:'dashboard',dashboard:'dashboard','user-management':'users',usuarios:'users',users:'users',approvals:'approvals',aprobaciones:'approvals',turnos:'turns',turns:'turns',clients:'clients',clientes:'clients',cashboxes:'cashboxes',cajas:'cashboxes',services:'services',servicios:'services',contracts:'contracts',contratos:'contracts',payments:'payments',pagos:'payments',reports:'reports',reportes:'reports'}; return map[route]||map[(item.code||'').toLowerCase()]||route; }
  icon(value?:string,code?:string):string { const v=(value||code||'').toLowerCase(); if(v.includes('user')||v.includes('usuario'))return '♙';if(v.includes('turn'))return '▤';if(v.includes('cash')||v.includes('caja'))return '▦';if(v.includes('client')||v.includes('cliente'))return '◎';if(v.includes('report'))return '▥';if(v.includes('pay'))return '$';return '◈'; }

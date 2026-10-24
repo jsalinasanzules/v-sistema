@@ -1,11 +1,11 @@
 import { Component, signal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../core/auth.service';
 
 @Component({
-  selector: 'app-login', standalone: true, imports: [ReactiveFormsModule, RouterLink],
+  selector: 'app-login', standalone: true, imports: [ReactiveFormsModule],
   template: `
   <main class="login-page">
     <section class="login-brand">
@@ -51,7 +51,8 @@ import { AuthService } from '../core/auth.service';
 export class LoginComponent {
   readonly year = new Date().getFullYear();
   readonly loading = signal(false); readonly error = signal(''); readonly recovering = signal(false); readonly recoveryMessage = signal('');
-  readonly form: FormGroup; readonly recoveryForm: FormGroup;
+  readonly form: FormGroup<{ username: FormControl<string>; password: FormControl<string> }>;
+  readonly recoveryForm: FormGroup<{ identity: FormControl<string> }>;
   constructor(fb: FormBuilder, private auth: AuthService, private router: Router) {
     this.form = fb.nonNullable.group({ username: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(20), Validators.pattern(/^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]+$/)]], password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(30), Validators.pattern(/^(?=.*[A-Z])(?=.*[0-9]).+$/)]] });
     this.recoveryForm = fb.nonNullable.group({ identity: ['', [Validators.required, Validators.maxLength(120)]] });
