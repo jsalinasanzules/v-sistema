@@ -55,7 +55,11 @@ public static class RequestUser
 {
     public static Guid Id(System.Security.Claims.ClaimsPrincipal user) =>
         Guid.TryParse(user.FindFirst("uid")?.Value, out var id) ? id : throw new UnauthorizedAccessException();
-    public static string Role(System.Security.Claims.ClaimsPrincipal user) => user.FindFirst("role")?.Value ?? "";
+    public static string Role(System.Security.Claims.ClaimsPrincipal user) =>
+        (user.FindFirst("role")?.Value
+         ?? user.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value
+         ?? user.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value
+         ?? string.Empty).Trim().ToUpperInvariant();
 }
 
 public sealed class AuthService(IConfiguration config, DataProtectionService crypto, AuditService audit, ILogger<AuthService> logger)
